@@ -20,16 +20,41 @@ def scan_serial_ports():
 def query_device_identity(port_name):
     try:
         # Open the serial connection
-        with serial.Serial(port=port_name, baudrate=4800, timeout=2) as ser:
+        with serial.Serial(port=port_name, baudrate=9600, timeout=2) as ser:
             # Send the *IDN? query to get device identity
             ser.write(b'*IDN?\n')
             
             # Wait for and read the response
-
             response = ser.readline().decode().strip()
             return response
     except Exception as e:
         return f"Error querying device: {e}"
+
+def measure_voltage(port_name):
+    try:
+        # Open the serial connection
+        with serial.Serial(port=port_name, baudrate=9600, timeout=2) as ser:
+            # Send the command to measure output voltage
+            ser.write(b'MEAS:VOLT?\n')  # Corrected SCPI command for voltage measurement
+            
+            # Wait for and read the response
+            response = ser.readline().decode().strip()
+            return response
+    except Exception as e:
+        return f"Error measuring voltage: {e}"
+
+def measure_current(port_name):
+    try:
+        # Open the serial connection
+        with serial.Serial(port=port_name, baudrate=9600, timeout=2) as ser:
+            # Send the command to measure output current
+            ser.write(b'MEAS:CURR?\n')  # Corrected SCPI command for current measurement
+            
+            # Wait for and read the response
+            response = ser.readline().decode().strip()
+            return response
+    except Exception as e:
+        return f"Error measuring current: {e}"
 
 def print_rs232_ports(rs232_ports):
     if rs232_ports:
@@ -53,5 +78,13 @@ if __name__ == "__main__":
         # Check if the device matches the 9115 Power Supply
         if "9115" in device_info:
             print(f"9115 Power Supply detected: {device_info}")
+            
+            # Measure and print the output voltage
+            voltage = measure_voltage(selected_port)
+            print(f"Output Voltage: {voltage} V")
+            
+            # Measure and print the output current
+            current = measure_current(selected_port)
+            print(f"Output Current: {current} A")
         else:
             print(f"Non-9115 device detected: {device_info}")
