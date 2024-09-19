@@ -22,10 +22,10 @@ def query_device_identity(port_name):
         # Open the serial connection
         with serial.Serial(port=port_name, baudrate=4800, timeout=2) as ser:
             # Send the *IDN? query to get device identity
-            ser.write(b'*IDN?\r\n')
+            ser.write(b'*IDN?\n')
             
             # Wait for and read the response
-            
+
             response = ser.readline().decode().strip()
             return response
     except Exception as e:
