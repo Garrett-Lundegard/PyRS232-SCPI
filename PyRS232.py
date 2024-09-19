@@ -17,6 +17,20 @@ def scan_serial_ports():
     
     return rs232_ports
 
+def query_device_identity(port_name):
+    try:
+        # Open the serial connection
+        with serial.Serial(port=port_name, baudrate=4800, timeout=2) as ser:
+            # Send the *IDN? query to get device identity
+            ser.write(b'*IDN?\r\n')
+            
+            # Wait for and read the response
+            
+            response = ser.readline().decode().strip()
+            return response
+    except Exception as e:
+        return f"Error querying device: {e}"
+
 def print_rs232_ports(rs232_ports):
     if rs232_ports:
         print("RS232/Serial devices found:")
@@ -28,3 +42,16 @@ def print_rs232_ports(rs232_ports):
 if __name__ == "__main__":
     rs232_ports = scan_serial_ports()
     print_rs232_ports(rs232_ports)
+    
+    if rs232_ports:
+        # Ask user to choose a port if multiple are available
+        selected_port = rs232_ports[0]['device']  # You can update this to prompt for a specific port
+        
+        # Query the identity of the connected device
+        device_info = query_device_identity(selected_port)
+        
+        # Check if the device matches the 9115 Power Supply
+        if "9115" in device_info:
+            print(f"9115 Power Supply detected: {device_info}")
+        else:
+            print(f"Non-9115 device detected: {device_info}")
